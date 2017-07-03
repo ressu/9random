@@ -8,6 +8,8 @@ import (
 
 func randomRedirect(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.UserAgent(), "facebookexternalhit/") {
+		w.Header().Add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
+		w.Header().Add("Expires", "Sat, 26 Jul 1997 05:00:00 GMT")
 		http.Redirect(w, r, urls[rand.Intn(len(urls))], http.StatusFound)
 	} else {
 		http.Redirect(w, r, "https://9gag.com/", http.StatusFound)
