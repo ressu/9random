@@ -1,9 +1,14 @@
 package main
 
 import (
-	"net/http"
+	"fmt"
 	"math/rand"
+	"net/http"
+	"os"
 	"strings"
+	"time"
+
+	fb "github.com/huandu/facebook"
 )
 
 func randomRedirect(w http.ResponseWriter, r *http.Request) {
@@ -13,6 +18,41 @@ func randomRedirect(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, urls[rand.Intn(len(urls))], http.StatusFound)
 	} else {
 		http.Redirect(w, r, "https://9gag.com/", http.StatusFound)
+	}
+}
+
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return defaultValue
+	}
+	return value
+}
+
+func refreshFacebook() {
+	appId := strings.TrimSpace(os.Getenv("FACEBOOK_APP_ID"))
+	appSecret := strings.TrimSpace(os.Getenv("FACEBOOK_APP_SECRET"))
+	appUrl := strings.TrimSpace(os.Getenv("APP_URL"))
+
+	if len(appId) == 0 || len(appSecret) == 0 {
+		fmt.Printf("No valid Facebook credentials")
+		return
+	}
+
+	var globalApp = fb.New(appId, appSecret)
+
+	session := globalApp.Session(globalApp.AppAccessToken())
+
+	for range time.Tick(time.Second * 10) {
+		res, _ := session.Post("/", fb.Params{
+			"id":     appUrl,
+			"scrape": "true",
+		})
+
+		if res.Err() != nil {
+			fmt.Printf("Error occurred with scrape: %s", res.Err())
+			return
+		}
 	}
 }
 
@@ -80,6 +120,7 @@ var urls = []string{
 }
 
 func main() {
+	go refreshFacebook()
 	http.HandleFunc("/", randomRedirect)
 	http.ListenAndServe(":8000", nil)
 }
