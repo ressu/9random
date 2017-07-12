@@ -1,12 +1,9 @@
-FROM golang:1.8 as builder
+FROM golang:1.8
 
 WORKDIR /go/src/app
 COPY . .
 
 RUN go-wrapper download   # "go get -d -v ./..."
-RUN CGO_ENABLED=0 go-wrapper install
+RUN go-wrapper install    # "go install -v ./..."
 
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-COPY --from=builder /go/bin/app /app
-CMD ["/app"]
+CMD ["go-wrapper", "run"] # ["app"]
