@@ -1,0 +1,13 @@
+runtime: go
+api_version: go1.8
+
+env_variables:
+  FACEBOOK_APP_ID: xxxxxxx
+  FACEBOOK_APP_SECRET: xxxxx
+  APP_URL: http://got.9gag.com/
+  SCRAPE_URLS: http://got.9gag.com/
+  SITE_URL: https://9gag.com/got?ref=gotgame
+
+handlers:
+- url: /.*
+  script: _go_app
