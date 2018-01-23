@@ -1,4 +1,4 @@
 cron:
-- description: daily summary job
-  url: /_internal/scheduleFacebook
-  schedule: every 5 minutes
+# - description: daily summary job
+#   url: /_internal/scheduleFacebook
+#   schedule: every 5 minutes
